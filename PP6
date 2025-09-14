@@ -1,0 +1,27 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import sum, col
+
+# Initialize SparkSession
+spark = SparkSession.builder.appName("EmployeeAnalysis").getOrCreate()
+
+# Given data and schema
+data = [("Dhanshri","Accountant","Maharashtra",90000,34,10000), ("Monika","Sales","Delhi",86000,56,20000),
+("Srinija","Sales","Andra Pradesh",81000,30,23000), ("Ruchitha","Finance","Karnataka",90000,24,23000), ("Amulya","Finance","Karnataka",99000,40,24000),
+("Muskan","Marketing","Gujrat",83000,36,19000), ("Kruti","Finance","Rajastan",79000,53,15000),
+("Swati","Marketing","Uttar Pradesh",80000,25,18000), ("Reethiksha","Marketing","Delhi",91000,50,21000)]
+schema = ["employee_name", "department", "state", "salary", "age", "bonus"] # i. Create RDD from the data
+rdd = spark.sparkContext.parallelize(data)
+
+# ii. Create PySpark DataFrame from RDD with schema df = spark.createDataFrame(rdd, schema)
+
+# Show the original DataFrame print("Original DataFrame:") df.show()
+
+# iii. Display state-wise salaries using groupBy() print("\nState-wise total salaries:")
+state_salaries = df.groupBy("state").sum("salary").withColumnRenamed("sum(salary)", "total_salary") state_salaries.show()
+
+# iv. Display state-wise salaries > 1 lakh
+print("\nState-wise salaries greater than 1 lakh:")
+state_salaries.filter(col("total_salary") > 100000).show()
+
+# v. Display state-wise salaries in descending order print("\nState-wise salaries in descending order:")
+state_salaries.orderBy(col("total_salary").desc()).show()
