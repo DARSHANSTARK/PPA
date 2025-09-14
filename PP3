@@ -1,0 +1,45 @@
+# Import necessary libraries
+from pyspark.sql import SparkSession from pyspark import SparkContext
+
+# Create a Spark session
+spark = SparkSession.builder \
+.appName("PySpark Example") \
+.getOrCreate()
+
+# Create a Spark context
+sc = SparkContext.getOrCreate()
+
+# Part a: Create an RDD of a set of numbers and perform the sum using an accumulator # Create an accumulator
+accumulator = sc.accumulator(0)
+
+# Create an RDD from a list of numbers numbers = [1, 2, 3, 4, 5]
+numbers_rdd = sc.parallelize(numbers)
+
+# Function to add numbers to the accumulator def add_to_accumulator(x):
+global accumulator accumulator += x
+
+# Use the foreach action to apply the function to each element in the RDD numbers_rdd.foreach(add_to_accumulator)
+
+# Print the value of the accumulator
+print("Sum of numbers using accumulator:", accumulator.value)
+
+# Part b: Create an RDD from a CSV file
+# For demonstration, we will create a sample CSV file csv_data = """name,age,salary
+Disha,30,80000
+Sakshi,35,50000 Rohit,45,80000
+Kartik,40,60000 Owi,25,75000
+"""
+# Save the CSV data to a file
+with open("sample_data.csv", "w") as f: f.write(csv_data)
+
+# Load the CSV file into a DataFrame
+df = spark.read.csv("sample_data.csv", header=True, inferSchema=True)
+
+# Show the top 5 rows of the DataFrame print("Top 5 rows of the dataset:")
+df.show(5)
+
+# Display statistical results
+print("Statistical summary of the dataset:")
+df.describe().show()
+
+# Stop the Spark session spark.stop()
