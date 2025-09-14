@@ -1,0 +1,23 @@
+from pyspark.sql import SparkSession # Initialize Spark Session
+spark = SparkSession.builder \
+.appName("WordCountMapReduce") \
+.getOrCreate()
+
+# Sample input data (embedded in the code) 
+input_data = [
+"Hello World Hello C++ Hello Python", "Python is independent Language",
+"C++ is dependent Language" "Hello again Python"
+]
+
+# Create RDD from the input data
+lines_rdd = spark.sparkContext.parallelize(input_data)
+
+# MapReduce implementation
+word_counts = lines_rdd.flatMap(lambda line: line.split(" ")).map(lambda word: (word.lower(), 1)).reduceByKey(lambda a, b: a + b)
+
+# Collect and display results
+results = word_counts.collect() print("Word Count Results:")
+for (word, count) in sorted(results): print(f"'{word}': {count}")
+
+# Stop Spark Session 
+spark.stop()
