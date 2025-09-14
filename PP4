@@ -1,0 +1,30 @@
+Double-click (or enter) to edit
+
+# Initialize Spark Session
+spark = SparkSession.builder \
+.appName("DataFrame Joins Example") \
+.getOrCreate()
+
+# Import Row
+from pyspark.sql import Row
+
+# Create DataFrame df1 with name, age, and height df1_data = [
+Row(name="Disha", age=30, height=5.5), Row(name="Kartik", age=25, height=6.0), Row(name="Owi", age=35, height=5.8)
+]
+df1 = spark.createDataFrame(df1_data)
+
+# Create DataFrame df2 with name, height, and weight df2_data = [
+Row(name="Disha", height=5.5), Row(name="Rohit", height=6.1), Row(name="Owi", height=5.8)
+]
+df2 = spark.createDataFrame(df2_data)
+
+# Show the DataFrames
+print("DataFrame df1:") df1.show()
+print("DataFrame df2:") df2.show()
+#Let's assume we have two DataFrames, df1 and df2, structured as follows:
+# Perform join to find the height
+result_height = df1.join(df2, on="name", how="outer").select(df1.name, df1.height.alias("height_df1"), df2.height.alias("height_df2")) result_height.show()
+# Perform outer join to find the heights
+result_outer_heights = df1.join(df2, on="name", how="outer").select(df1.name, df1.height, df2.height) result_outer_heights.show()
+# Perform outer join to find the age
+result_outer_age = df1.join(df2, on="name", how="outer").select(df1.name, df1.age) result_outer_age.show()
