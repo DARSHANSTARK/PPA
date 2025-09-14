@@ -1,0 +1,19 @@
+from pyspark.sql import SparkSession
+#Create a Spark Session
+spark = SparkSession.builder.appName("WordContTest").getOrCreate()
+# Create a SparkContext from the Spark session
+sc = spark.sparkContext
+# Load the input file into an RDD
+rdd = sc.textFile("WC.rtf")
+# Split lines into words and flatten the RDD
+words = rdd.flatMap(lambda line: line.split(" "))
+# Count the total number of words
+word_count = words.count()
+# Find the string with the highest occurrence
+word_occurrences = words.map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b)
+most_common_word = word_occurrences.reduce(lambda a, b: a if a[1] > b[1] else b)
+# Print the results
+print(f"Total word count: {word_count}")
+print(f"The string with the highest occurrence: '{most_common_word[0]}' with {most_common_word[1]} occurrences")
+# Stop the Spark session
+spark.stop()
