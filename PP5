@@ -1,0 +1,29 @@
+Given the following data:
+data = [("1", "dhanshri sonawane"), ("2", "sakshi rangari"), ("3", "disha yerandekar")], along with the following schema of the data columns = ["Seqno","Name"]
+from pyspark.sql import SparkSession from pyspark.sql.functions import udf
+from pyspark.sql.types import StringType
+
+# Initialize SparkSession
+spark = SparkSession.builder.appName("NameFormatting").getOrCreate()
+
+# Given data and schema
+data = [("1", "dhanshri sonawane"), ("2", "sakshi rangari"), ("3", "disha yerandekar")] columns = ["Seqno", "Name"]
+
+# i. Create RDD from the data
+rdd = spark.sparkContext.parallelize(data)
+
+# ii. Create PySpark DataFrame from RDD with schema df = spark.createDataFrame(rdd, columns)
+
+# Show original DataFrame
+print("Original DataFrame:") df.show()
+
+# iii. Python function to convert first letter of every string to uppercase def capitalize_words(name):
+return ' '.join([word.capitalize() for word in name.strip().split()])
+
+# iv. Register the function as UDF
+capitalize_udf = udf(capitalize_words, StringType())
+
+# Apply the UDF to the Name column
+df_formatted = df.withColumn("Name", capitalize_udf(df["Name"]))
+
+# Show the formatted DataFrame print("\nFormatted DataFrame:") df_formatted.show()
