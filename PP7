@@ -1,0 +1,55 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import when, col, avg, lit
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+
+# Initialize Spark Session
+spark = SparkSession.builder.appName("LifeStageAnalysis").getOrCreate()
+
+# Sample data
+data = [("John", 25, "Adult"),
+("Sarah", 12, "Child"),
+("Mike", 17, "Teenager"),
+("Emily", 30, "Adult"),
+("David", 15, "Teenager")]
+
+# Define schema
+schema = StructType([
+StructField("name", StringType(), True), StructField("age", IntegerType(), True),
+StructField("life_stage", StringType(), True)
+])
+
+# Create DataFrame
+df = spark.createDataFrame(data, schema=schema) print("Original DataFrame:")
+df.show()
+
+# i. Check the life stage of each person (alternative approach) 
+df_with_lifestage = df.withColumn("life_stage_verified",
+when(col("age") < 13, "Child")
+.when((col("age") >= 13) & (col("age") < 20), "Teenager")
+.otherwise("Adult"))
+
+print("\nDataFrame with verified life stage:") df_with_lifestage.show()
+
+# ii. Display entries of teenager and adult only
+teen_adult_df = df.filter((col("life_stage") == "Teenager") | (col("life_stage") == "Adult")) print("\nTeenager and Adult entries only:")
+teen_adult_df.show()
+
+# iii. Calculate average age
+avg_age = df.select(avg("age").alias("average_age")) print("\nAverage age:")
+avg_age.show()
+
+# iv. Group by life_stage
+grouped_df = df.groupBy("life_stage").count() print("\nGrouped by life_stage:")
+grouped_df.show()
+
+# v. Insert a record "Frank,4,Child" into new DataFrame
+new_data = [("Frank", 4, "Child")]
+new_df = spark.createDataFrame(new_data, schema=schema) combined_df = df.union(new_df)
+print("\nDataFrame with new record:") combined_df.show()
+
+# vi. Display teenage entries
+teenage_df = df.filter(col("life_stage") == "Teenager") print("\nTeenage entries:")
+teenage_df.show()
+
+# Stop Spark Session 
+spark.stop()
