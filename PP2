@@ -1,0 +1,21 @@
+import pyspark
+spark = SparkSession.builder.appName('RDD_Join_Example').getOrCreate()
+# Create RDDs
+x = spark.sparkContext.parallelize([("DSA", 1), ("IOT", 4), ("BDA", 3), ("CCT", 6)])
+y = spark.sparkContext.parallelize([("DSA", 2), ("IOT", 5), ("ACN", 1), ("BDA", 3)])
+# Inner Join
+inner_join_result = x.join(y)
+print("Inner Join Result:")
+print(inner_join_result.collect())
+# Left Join
+left_join_result = x.leftOuterJoin(y)
+print("\nLeft Join Result:")
+print(left_join_result.collect())
+# Right Join
+right_join_result = x.rightOuterJoin(y)
+print("\nRight Join Result:")
+print(right_join_result.collect())
+# Full Outer Join
+full_outer_join_result = x.fullOuterJoin(y)
+print("\nFull Outer Join Result:")
+print(full_outer_join_result.collect())
